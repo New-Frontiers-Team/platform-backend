@@ -25,4 +25,26 @@ export class TicketsService {
       throw new BadRequestException('Someting bad happened.')
     }
   }
+
+  async findTickets(userId: number, page: number, limit: number) {
+    try {
+      const total = await this.prisma.ticket.count({
+        where: {
+          userId: userId
+        }
+      })
+
+      const tickets = await this.prisma.ticket.findMany({
+        where: {
+          userId: userId
+        },
+        skip: (page - 1) * limit,
+        take: limit
+      })
+
+      return ({ data: tickets, meta: { page: page, limit: limit, total: total } })
+    } catch (error) {
+      throw new BadRequestException('Someting bad happened.')
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role, Ticket } from '@prisma/client';
+import { Ticket } from '@prisma/client';
 
 export class TicketEntity implements Ticket {
   constructor(partial: Partial<TicketEntity>) {
