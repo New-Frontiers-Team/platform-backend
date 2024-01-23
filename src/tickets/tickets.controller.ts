@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { ApiCreatedResponse } from '@nestjs/swagger';
 import { TicketEntity } from './entities/ticket.entity';
 import { CreateTicketDto } from './dto/createTicket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RequestWithUser } from 'src/types/request';
-import { TicketsEntity } from './entities/tickets.entity';
+import { TicketListEntity } from './entities/ticketList.entity';
 
 @Controller('tickets')
 export class TicketsController {
@@ -23,11 +23,21 @@ export class TicketsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: TicketsEntity })
+  @ApiCreatedResponse({ type: TicketListEntity })
   async findTickets(
     @Query() query: any,
     @Request() req: RequestWithUser
   ) {
-    return this.ticketsService.findTickets(req.user.id, parseInt(query.page), parseInt(query.limit))
+    return this.ticketsService.findTickets(req.user.id, req.user.role, parseInt(query.page), parseInt(query.limit))
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: TicketEntity })
+  async assumeTicket(
+    @Param('id') id: string,
+    @Request() req: RequestWithUser
+  ) {
+    return this.ticketsService.assumeTicket(id, req.user.id)
   }
 }

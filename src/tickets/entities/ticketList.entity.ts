@@ -7,8 +7,8 @@ type Pagination = {
   total: number
 }
 
-export class TicketsEntity {
-  constructor(partial: Partial<TicketsEntity>) {
+export class TicketListEntity {
+  constructor(partial: Partial<TicketListEntity>) {
     Object.assign(this, partial);
   }
 
