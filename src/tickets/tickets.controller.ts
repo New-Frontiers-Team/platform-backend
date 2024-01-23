@@ -40,4 +40,14 @@ export class TicketsController {
   ) {
     return this.ticketsService.assumeTicket(id, req.user.id)
   }
+
+  @Post(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: TicketEntity})
+  async closeTicket(
+    @Param('id') id: string,
+    @Request() req: RequestWithUser
+  ) {
+    return this.ticketsService.closeTicket(id, req.user.role)
+  }
 }

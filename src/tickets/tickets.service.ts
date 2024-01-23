@@ -74,4 +74,25 @@ export class TicketsService {
       throw new BadRequestException('Somenting bad happened.')
     }
   }
+
+  async closeTicket(ticketId: string, responsibleRole: string) {
+    try {
+      const ticket = await this.prisma.ticket.update({
+        where: {
+          id: ticketId
+        },
+        data: {
+          status: "closed"
+        },
+        include: {
+          user: true,
+          responsible: true
+        }
+      })
+
+      return ticket
+    } catch (error) {
+      throw new BadRequestException('Somenting bad happened.')
+    }
+  }
 }
