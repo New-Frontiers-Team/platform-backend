@@ -13,6 +13,7 @@ export class UsersService {
             if (user) {
                 throw new ConflictException('Already existing account.')
             }
+
             await this.prisma.user.create({
                 data: {
                     username: username,
@@ -20,7 +21,6 @@ export class UsersService {
                     password: await bcrypt.hash(password, 15)
                 }
             })
-
             return null
         } catch (error) {
             if (error.status == 409) {
