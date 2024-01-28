@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { ApiCreatedResponse } from '@nestjs/swagger';
 import { TicketEntity } from './entities/ticket.entity';
@@ -38,16 +38,26 @@ export class TicketsController {
     @Param('id') id: string,
     @Request() req: RequestWithUser
   ) {
-    return this.ticketsService.assumeTicket(id, req.user.id)
+    return this.ticketsService.assumeTicket(id, req.user.id, req.user.role)
   }
 
   @Post(':id')
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: TicketEntity})
+  @ApiCreatedResponse({ type: TicketEntity })
   async closeTicket(
     @Param('id') id: string,
     @Request() req: RequestWithUser
   ) {
     return this.ticketsService.closeTicket(id, req.user.role)
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: TicketEntity })
+  async deleteTicket(
+    @Param('id') id: string,
+    @Request() req: RequestWithUser
+  ) {
+    return this.ticketsService.deleteTicket(id, req.user.role)
   }
 }

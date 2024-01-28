@@ -23,4 +23,7 @@ export class TicketEntity implements Ticket {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
+  deleted: Date | null;
 }

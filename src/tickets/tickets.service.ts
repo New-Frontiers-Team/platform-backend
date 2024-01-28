@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { isAdmin } from 'src/helpers/authorization';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -31,13 +31,15 @@ export class TicketsService {
     try {
       const total = await this.prisma.ticket.count({
         where: {
-          userId: userId
+          userId: userId,
+          deleted: null
         }
       })
 
       const tickets = await this.prisma.ticket.findMany({
         where: {
-          ...(isAdmin(userRole) ? {} : { userId: userId })
+          ...(isAdmin(userRole) ? {} : { userId: userId }),
+          deleted: null
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -53,7 +55,8 @@ export class TicketsService {
     }
   }
 
-  async assumeTicket(ticketId: string, responsibleId: number) {
+  async assumeTicket(ticketId: string, responsibleId: number, userRole: string) {
+    if (!isAdmin(userRole)) throw new UnauthorizedException('You do not assume a ticket.')
     try {
       const ticket = await this.prisma.ticket.update({
         where: {
@@ -75,7 +78,8 @@ export class TicketsService {
     }
   }
 
-  async closeTicket(ticketId: string, responsibleRole: string) {
+  async closeTicket(ticketId: string, userRole: string) {
+    if (!isAdmin(userRole)) throw new UnauthorizedException('You do not close a ticket.')
     try {
       const ticket = await this.prisma.ticket.update({
         where: {
@@ -92,6 +96,29 @@ export class TicketsService {
 
       return ticket
     } catch (error) {
+      throw new BadRequestException('Somenting bad happened.')
+    }
+  }
+
+  async deleteTicket(ticketId: string, userRole: string) {
+    if (!isAdmin(userRole)) throw new UnauthorizedException('You can delete a ticket.')
+    try {
+      const ticket = await this.prisma.ticket.update({
+        where: {
+          id: ticketId
+        },
+        data: {
+          deleted: new Date()
+        },
+        include: {
+          user: true,
+          responsible: true
+        }
+      })
+
+      return ticket
+    } catch (error) {
+      console.log(error)
       throw new BadRequestException('Somenting bad happened.')
     }
   }

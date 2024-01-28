@@ -35,6 +35,7 @@ model Ticket {
   title         String
   status        String   @default("new")
   createdAt     DateTime @default(now())
+  deleted       DateTime?
   user          User     @relation("Ticket_user", fields: [userId], references: [id])
   responsible   User?    @relation("Ticket_responsible", fields: [responsibleId], references: [id])
   messages      TicketMessages[]
